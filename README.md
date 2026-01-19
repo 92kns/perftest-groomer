@@ -16,7 +16,7 @@ A rule-based issue classification tool for Firefox Performance testing. Runs ent
 
 ## Usage
 
-1. Go to the [live app](https://YOUR_USERNAME.github.io/perftest-groomer/) (update after deploying)
+1. Go to the [live app](https://92kns.github.io/perftest-groomer/) (update after deploying)
 2. Export your issues from Jira as CSV
 3. Drag and drop the CSV file (or click to upload)
 4. Review the suggested grooming

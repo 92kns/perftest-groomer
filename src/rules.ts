@@ -157,7 +157,7 @@ const rules: Rule[] = [
         workTrack: okrMatch ? 'Vision' : 'Vision',
         estimate: '4w',
         reasoning: 'Meta bug - tracking issue for larger effort',
-        okrMatch,
+        ...(okrMatch && { okrMatch }),
       };
     }
     return null;
