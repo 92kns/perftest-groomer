@@ -61,7 +61,7 @@ function renderStats(results: GroomingResult[]) {
   const stats = document.getElementById('stats')!;
   const priorities: Record<Priority, number> = { P1: 0, P2: 0, P3: 0, P4: 0 };
 
-  results.forEach(r => priorities[r.priority]++);
+  results.forEach((r) => priorities[r.priority]++);
 
   stats.innerHTML = `
     <div class="stat-card">
@@ -86,11 +86,11 @@ function renderStats(results: GroomingResult[]) {
     </div>
     <div class="stat-card">
       <div class="label">Operational</div>
-      <div class="value">${results.filter(r => r.workTrack === 'Operational').length}</div>
+      <div class="value">${results.filter((r) => r.workTrack === 'Operational').length}</div>
     </div>
     <div class="stat-card">
       <div class="label">Vision</div>
-      <div class="value">${results.filter(r => r.workTrack === 'Vision').length}</div>
+      <div class="value">${results.filter((r) => r.workTrack === 'Vision').length}</div>
     </div>
   `;
 }
@@ -103,7 +103,9 @@ function renderTable(results: GroomingResult[]) {
     return priorityOrder.indexOf(a.priority) - priorityOrder.indexOf(b.priority);
   });
 
-  tbody.innerHTML = sortedResults.map(r => `
+  tbody.innerHTML = sortedResults
+    .map(
+      (r) => `
     <tr>
       <td>
         <a href="https://mozilla-hub.atlassian.net/browse/${r.issue.key}" target="_blank" class="issue-key">${r.issue.key}</a>
@@ -127,15 +129,18 @@ function renderTable(results: GroomingResult[]) {
       <td>
         <div class="reasoning">${escapeHtml(r.reasoning.join('; '))}</div>
         ${r.okrMatch ? `<div class="okr-tag">${r.okrMatch.okr}</div>` : ''}
-        ${r.labels.length ? `<div style="margin-top: 0.25rem">${r.labels.map(l => `<span class="okr-tag">${l}</span>`).join(' ')}</div>` : ''}
+        ${r.labels.length ? `<div style="margin-top: 0.25rem">${r.labels.map((l) => `<span class="okr-tag">${l}</span>`).join(' ')}</div>` : ''}
       </td>
     </tr>
-  `).join('');
+  `
+    )
+    .join('');
 }
 
 function setupExportButtons() {
   document.getElementById('exportCsv')!.onclick = () => showExport('CSV', generateCSV());
-  document.getElementById('exportMarkdown')!.onclick = () => showExport('Markdown', generateMarkdown());
+  document.getElementById('exportMarkdown')!.onclick = () =>
+    showExport('Markdown', generateMarkdown());
   document.getElementById('copyTable')!.onclick = () => {
     navigator.clipboard.writeText(generateMarkdown());
     alert('Table copied to clipboard!');
@@ -153,8 +158,18 @@ function showExport(title: string, content: string) {
 }
 
 function generateCSV(): string {
-  const headers = ['Issue Key', 'Summary', 'Priority', 'Impact', 'Estimate', 'Work Track', 'OKR', 'Labels', 'Reasoning'];
-  const rows = currentResults.map(r => [
+  const headers = [
+    'Issue Key',
+    'Summary',
+    'Priority',
+    'Impact',
+    'Estimate',
+    'Work Track',
+    'OKR',
+    'Labels',
+    'Reasoning',
+  ];
+  const rows = currentResults.map((r) => [
     r.issue.key,
     `"${r.issue.summary.replace(/"/g, '""')}"`,
     r.priority,
@@ -166,7 +181,7 @@ function generateCSV(): string {
     `"${r.reasoning.join('; ').replace(/"/g, '""')}"`,
   ]);
 
-  return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  return [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
 }
 
 function generateMarkdown(): string {
@@ -181,7 +196,8 @@ function generateMarkdown(): string {
   md += '|-------|---------|----------|--------|----------|------------|----------|\n';
 
   for (const r of sortedResults) {
-    const summary = r.issue.summary.length > 50 ? r.issue.summary.slice(0, 50) + '...' : r.issue.summary;
+    const summary =
+      r.issue.summary.length > 50 ? r.issue.summary.slice(0, 50) + '...' : r.issue.summary;
     const reasoning = r.reasoning.join('; ').slice(0, 50);
     md += `| ${r.issue.key} | ${summary} | ${r.priority} | ${r.impact} | ${r.estimate} | ${r.workTrack} | ${reasoning} |\n`;
   }
@@ -193,6 +209,14 @@ function escapeHtml(text: string): string {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+// Display build time
+declare const __BUILD_TIME__: string;
+const buildTimeEl = document.getElementById('buildTime');
+if (buildTimeEl) {
+  const buildDate = new Date(__BUILD_TIME__);
+  buildTimeEl.textContent = buildDate.toISOString().replace('T', ' ').split('.')[0];
 }
 
 // Load PapaParse from CDN

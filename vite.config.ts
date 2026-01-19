@@ -1,8 +1,11 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vite';
 
 export default defineConfig({
   base: '/perftest-groomer/',
   build: {
-    outDir: 'dist'
-  }
-})
+    outDir: 'dist',
+  },
+  define: {
+    __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+  },
+});

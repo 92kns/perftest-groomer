@@ -263,6 +263,15 @@
       border-radius: 4px;
       cursor: pointer;
     }
+
+    .footer {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--primary);
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
   </style>
 </head>
 <body>
@@ -309,6 +318,10 @@
         <button class="close-btn" id="closeModal">Close</button>
       </div>
     </div>
+
+    <footer class="footer">
+      <p>Last deployed: <span id="buildTime">Loading...</span> UTC</p>
+    </footer>
   </div>
 
   <script type="module" src="/src/main.ts"></script>

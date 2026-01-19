@@ -51,12 +51,7 @@ const OKR_PATTERNS = {
     /fcp/i,
     /first.?contentful/i,
   ],
-  'Adaptive Performance': [
-    /battery/i,
-    /power/i,
-    /adaptive/i,
-    /hardware.?pref/i,
-  ],
+  'Adaptive Performance': [/battery/i, /power/i, /adaptive/i, /hardware.?pref/i],
 };
 
 function matchOKR(text: string): OKRMatch | null {
@@ -73,8 +68,12 @@ function matchOKR(text: string): OKRMatch | null {
 const rules: Rule[] = [
   // Intermittent/Perma - highest priority
   (ctx) => {
-    const isIntermittent = /intermittent|perma|flaky|sporadic/i.test(ctx.summaryLower + ctx.descriptionLower);
-    const isCIRelated = /ci|test.?failure|failure.?in/i.test(ctx.summaryLower + ctx.descriptionLower);
+    const isIntermittent = /intermittent|perma|flaky|sporadic/i.test(
+      ctx.summaryLower + ctx.descriptionLower
+    );
+    const isCIRelated = /ci|test.?failure|failure.?in/i.test(
+      ctx.summaryLower + ctx.descriptionLower
+    );
 
     if (isIntermittent || (ctx.isBug && isCIRelated)) {
       return {
@@ -91,7 +90,9 @@ const rules: Rule[] = [
 
   // External browser (Chrome/Safari) - Vision by default
   (ctx) => {
-    const isExternalBrowser = /chrome|safari|chromium|webkit/i.test(ctx.summaryLower + ctx.descriptionLower);
+    const isExternalBrowser = /chrome|safari|chromium|webkit/i.test(
+      ctx.summaryLower + ctx.descriptionLower
+    );
     const isIntermittent = /intermittent|perma|flaky/i.test(ctx.summaryLower);
 
     if (isExternalBrowser) {
@@ -133,7 +134,8 @@ const rules: Rule[] = [
 
   // UI/UX bugs - lower priority operational
   (ctx) => {
-    const isUIBug = ctx.isBug && /button|display|ui|view|window|show|hidden|close/i.test(ctx.summaryLower);
+    const isUIBug =
+      ctx.isBug && /button|display|ui|view|window|show|hidden|close/i.test(ctx.summaryLower);
 
     if (isUIBug) {
       return {
@@ -165,7 +167,9 @@ const rules: Rule[] = [
 
   // Sheriffing/automation tasks
   (ctx) => {
-    const isSheriffing = /sheriff|backfill|alert|triage/i.test(ctx.summaryLower + ctx.descriptionLower);
+    const isSheriffing = /sheriff|backfill|alert|triage/i.test(
+      ctx.summaryLower + ctx.descriptionLower
+    );
     const isAutomation = /automat|bot|mirror/i.test(ctx.summaryLower + ctx.descriptionLower);
 
     if (isSheriffing || isAutomation) {
@@ -182,7 +186,9 @@ const rules: Rule[] = [
 
   // Documentation tasks
   (ctx) => {
-    const isDocumentation = /doc|perfdoc|readme|guide/i.test(ctx.summaryLower + ctx.descriptionLower);
+    const isDocumentation = /doc|perfdoc|readme|guide/i.test(
+      ctx.summaryLower + ctx.descriptionLower
+    );
 
     if (isDocumentation) {
       return {
@@ -232,7 +238,9 @@ const rules: Rule[] = [
 
   // Testing infrastructure
   (ctx) => {
-    const isTestInfra = /raptor|browsertime|mozperftest|xpcshell/i.test(ctx.summaryLower + ctx.components);
+    const isTestInfra = /raptor|browsertime|mozperftest|xpcshell/i.test(
+      ctx.summaryLower + ctx.components
+    );
 
     if (isTestInfra && !ctx.isBug) {
       return {
@@ -289,34 +297,36 @@ export function applyRules(ctx: RuleContext): RuleResult {
 
   // Priority: take highest priority (P1 > P2 > P3 > P4)
   const priorityOrder: Priority[] = ['P1', 'P2', 'P3', 'P4'];
-  const priorities = results.map(r => r.priority).filter(Boolean) as Priority[];
-  const bestPriority = priorities.sort((a, b) =>
-    priorityOrder.indexOf(a) - priorityOrder.indexOf(b)
-  )[0] || defaultResult.priority!;
+  const priorities = results.map((r) => r.priority).filter(Boolean) as Priority[];
+  const bestPriority =
+    priorities.sort((a, b) => priorityOrder.indexOf(a) - priorityOrder.indexOf(b))[0] ||
+    defaultResult.priority!;
 
   // Impact: take highest impact
   const impactOrder: Impact[] = ['High', 'Medium', 'Low'];
-  const impacts = results.map(r => r.impact).filter(Boolean) as Impact[];
-  const bestImpact = impacts.sort((a, b) =>
-    impactOrder.indexOf(a) - impactOrder.indexOf(b)
-  )[0] || defaultResult.impact!;
+  const impacts = results.map((r) => r.impact).filter(Boolean) as Impact[];
+  const bestImpact =
+    impacts.sort((a, b) => impactOrder.indexOf(a) - impactOrder.indexOf(b))[0] ||
+    defaultResult.impact!;
 
   // WorkTrack: prefer Operational
-  const workTracks = results.map(r => r.workTrack).filter(Boolean) as WorkTrack[];
-  const bestWorkTrack = workTracks.includes('Operational') ? 'Operational' : (workTracks[0] || defaultResult.workTrack!);
+  const workTracks = results.map((r) => r.workTrack).filter(Boolean) as WorkTrack[];
+  const bestWorkTrack = workTracks.includes('Operational')
+    ? 'Operational'
+    : workTracks[0] || defaultResult.workTrack!;
 
   // Estimate: take the first non-null
-  const estimates = results.map(r => r.estimate).filter(Boolean) as Estimate[];
+  const estimates = results.map((r) => r.estimate).filter(Boolean) as Estimate[];
   const bestEstimate = estimates[0] || defaultResult.estimate!;
 
   // Combine reasoning
-  const reasoning = results.map(r => r.reasoning).join('; ');
+  const reasoning = results.map((r) => r.reasoning).join('; ');
 
   // Get OKR match if any
-  const okrMatch = results.find(r => r.okrMatch)?.okrMatch;
+  const okrMatch = results.find((r) => r.okrMatch)?.okrMatch;
 
   // Combine labels
-  const labels = [...new Set(results.flatMap(r => r.labels || []))];
+  const labels = [...new Set(results.flatMap((r) => r.labels || []))];
 
   return {
     priority: bestPriority,
