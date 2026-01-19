@@ -30,17 +30,11 @@ npm install
 npm run dev
 ```
 
-## Deployment
-
-```bash
-npm run deploy
-```
-
 ## Grooming Rules
 
 The tool uses rule-based classification based on:
 
-### Priority Rules
+### Priority Rules (WIP)
 
 | Condition | Priority | Work Track |
 |-----------|----------|------------|
