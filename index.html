@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PerfTest Groomer</title>
+  <style>
+    :root {
+      --bg: #1a1a2e;
+      --surface: #16213e;
+      --primary: #0f3460;
+      --accent: #e94560;
+      --text: #eaeaea;
+      --text-muted: #a0a0a0;
+      --success: #4ade80;
+      --warning: #fbbf24;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin-bottom: 0.5rem;
+      color: var(--accent);
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+
+    .upload-area {
+      border: 2px dashed var(--primary);
+      border-radius: 8px;
+      padding: 3rem;
+      text-align: center;
+      margin-bottom: 2rem;
+      transition: border-color 0.2s;
+      cursor: pointer;
+    }
+
+    .upload-area:hover, .upload-area.dragover {
+      border-color: var(--accent);
+    }
+
+    .upload-area input {
+      display: none;
+    }
+
+    .upload-btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-top: 1rem;
+    }
+
+    .upload-btn:hover {
+      opacity: 0.9;
+    }
+
+    .stats {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      min-width: 150px;
+    }
+
+    .stat-card .label {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    .stat-card .value {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .stat-card.p1 .value { color: #ef4444; }
+    .stat-card.p2 .value { color: #f97316; }
+    .stat-card.p3 .value { color: #eab308; }
+    .stat-card.p4 .value { color: #22c55e; }
+
+    .actions {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .action-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .action-btn:hover {
+      opacity: 0.9;
+    }
+
+    .action-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .issues-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .issues-table th {
+      background: var(--primary);
+      padding: 1rem;
+      text-align: left;
+      font-weight: 500;
+    }
+
+    .issues-table td {
+      padding: 1rem;
+      border-bottom: 1px solid var(--primary);
+      vertical-align: top;
+    }
+
+    .issues-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .issue-key {
+      font-family: monospace;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    .issue-summary {
+      max-width: 300px;
+    }
+
+    .priority-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .priority-badge.p1 { background: #ef4444; color: white; }
+    .priority-badge.p2 { background: #f97316; color: white; }
+    .priority-badge.p3 { background: #eab308; color: black; }
+    .priority-badge.p4 { background: #22c55e; color: white; }
+
+    .impact-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      background: var(--primary);
+    }
+
+    .impact-badge.high { border-left: 3px solid #ef4444; }
+    .impact-badge.medium { border-left: 3px solid #eab308; }
+    .impact-badge.low { border-left: 3px solid #22c55e; }
+
+    .work-track {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .work-track.operational { color: var(--accent); }
+    .work-track.vision { color: #818cf8; }
+
+    .reasoning {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      max-width: 250px;
+    }
+
+    .okr-tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      padding: 0.15rem 0.4rem;
+      background: var(--primary);
+      border-radius: 3px;
+      margin-top: 0.25rem;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .export-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .export-modal-content {
+      background: var(--surface);
+      padding: 2rem;
+      border-radius: 8px;
+      max-width: 800px;
+      width: 90%;
+      max-height: 80vh;
+      overflow: auto;
+    }
+
+    .export-modal textarea {
+      width: 100%;
+      height: 300px;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--primary);
+      border-radius: 4px;
+      padding: 1rem;
+      font-family: monospace;
+      font-size: 0.85rem;
+      margin: 1rem 0;
+    }
+
+    .export-modal .close-btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+  <script type="module" crossorigin src="/perftest-groomer/assets/index-DqiYZlqF.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>PerfTest Groomer</h1>
+    <p class="subtitle">Rule-based issue classification for Firefox Performance testing</p>
+
+    <div class="upload-area" id="uploadArea">
+      <p>Drag and drop your Jira CSV export here</p>
+      <p style="color: var(--text-muted); margin-top: 0.5rem;">or</p>
+      <button class="upload-btn" id="uploadBtn">Select CSV File</button>
+      <input type="file" id="fileInput" accept=".csv">
+    </div>
+
+    <div id="results" class="hidden">
+      <div class="stats" id="stats"></div>
+
+      <div class="actions">
+        <button class="action-btn" id="exportCsv">Export CSV</button>
+        <button class="action-btn" id="exportMarkdown">Export Markdown</button>
+        <button class="action-btn" id="copyTable">Copy Table</button>
+      </div>
+
+      <table class="issues-table">
+        <thead>
+          <tr>
+            <th>Issue</th>
+            <th>Summary</th>
+            <th>Priority</th>
+            <th>Impact</th>
+            <th>Estimate</th>
+            <th>Work Track</th>
+            <th>Reasoning</th>
+          </tr>
+        </thead>
+        <tbody id="issuesBody"></tbody>
+      </table>
+    </div>
+
+    <div id="exportModal" class="export-modal hidden">
+      <div class="export-modal-content">
+        <h2 id="modalTitle">Export</h2>
+        <textarea id="exportContent" readonly></textarea>
+        <button class="close-btn" id="closeModal">Close</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
