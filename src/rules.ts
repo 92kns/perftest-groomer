@@ -66,11 +66,9 @@ function matchOKR(text: string): OKRMatch | null {
 }
 
 const rules: Rule[] = [
-  // Intermittent/Perma - highest priority
+  // Intermittent/Perma - highest priority (only check title/summary)
   (ctx) => {
-    const isIntermittent = /intermittent|perma|flaky|sporadic/i.test(
-      ctx.summaryLower + ctx.descriptionLower
-    );
+    const isIntermittent = /intermittent|perma|flaky|sporadic/i.test(ctx.summaryLower);
     const isCIRelated = /ci|test.?failure|failure.?in/i.test(
       ctx.summaryLower + ctx.descriptionLower
     );

@@ -41,6 +41,24 @@ describe('Rule Engine', () => {
       expect(result.priority).toBe('P1');
       expect(result.workTrack).toBe('Operational');
     });
+
+    it('should NOT classify as P1 if intermittent only in description', () => {
+      const ctx: RuleContext = {
+        summary: 'Fix browsertime test',
+        summaryLower: 'fix browsertime test',
+        description: 'This test is intermittent sometimes',
+        descriptionLower: 'this test is intermittent sometimes',
+        type: 'Bug',
+        components: '',
+        labels: '',
+        isMeta: false,
+        isBug: true,
+      };
+
+      const result = applyRules(ctx);
+
+      expect(result.priority).not.toBe('P1');
+    });
   });
 
   describe('External browser tests', () => {

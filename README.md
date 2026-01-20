@@ -38,7 +38,7 @@ The tool uses rule-based classification based on:
 
 | Condition | Priority | Work Track |
 |-----------|----------|------------|
-| Intermittent/perma test failure | P1 | Operational |
+| Intermittent/perma in **title** | P1 | Operational |
 | External browser intermittent | P1 | Operational |
 | Performance/slowness bug | P2 | Operational |
 | Sheriffing/automation task | P2 | Operational |
